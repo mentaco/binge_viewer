@@ -7,50 +7,54 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
 
+class BingeViewer:
+    def __init__(self, url):
+        self.start_url = url
+        self.service = Service(executable_path=GeckoDriverManager().install())
+        self.driver = webdriver.Firefox(service=self.service)
+        self.wait = WebDriverWait(driver=self.driver, timeout=15)
+    
+    def start_viewing(self):
+        self.driver.get(self.start_url)
 
-def login(driver, wait):
-    while True:
-        try:
-            userid = driver.find_element(By.ID, "login-username")
-            password = driver.find_element(By.ID, "login-password")
+        if self.login():
+            self.driver.quit()
 
-            _id = input("your id > ")
-            _passwd = getpass.getpass("your password > ")
-            userid.send_keys(_id)
-            password.send_keys(_passwd)
+        self.video_view()
 
-            login_button = driver.find_element(By.ID, "btn-login")
-            login_button.click()
+    def login(self):
+        self.wait.until(EC.presence_of_all_elements_located)
 
-            wait.until(EC.presence_of_all_elements_located)
+        while True:
+            try:
+                userid = self.driver.find_element(By.ID, "login-username")
+                password = self.driver.find_element(By.ID, "login-password")
 
-            if "ログインに失敗" in driver.page_source:
-                print("Login failed.")
-                
-            elif "指定回数を超えた" in driver.page_source:
-                print("Authentication locked.")
+                userid.send_keys(input("your id > "))
+                password.send_keys(getpass.getpass("your password > "))
+
+                login_button = self.driver.find_element(By.ID, "btn-login")
+                login_button.click()
+
+                self.wait.until(EC.presence_of_all_elements_located)
+
+                if "ログインに失敗" in self.driver.page_source:
+                    print("Login failed.")
+                    
+                elif "指定回数を超えた" in self.driver.page_source:
+                    print("Authentication locked.")
+                    return 1
+                else:
+                    print("Login success.")
+                    return 0
+            except Exception as e:
+                print(e)
+                print("An error has occurred.")
                 return 1
-            else:
-                print("Login success.")
-                return 0
-        except Exception as e:
-            print(e)
-            print("An error has occurred.")
-            return 1
 
-def video_view(url):
-    service = Service(executable_path=GeckoDriverManager().install())
-    driver = webdriver.Firefox(service=service)
-
-    wait = WebDriverWait(driver=driver, timeout=15)
-
-    driver.get(url)
-
-    if login(driver, wait):
-        driver.quit()
-
-    play_btn = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vjs-big-play-button")))
-    play_btn.click()
+    def video_view(self):
+        play_btn = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vjs-big-play-button")))
+        play_btn.click()
     
 
 if __name__ == '__main__':
@@ -58,4 +62,5 @@ if __name__ == '__main__':
         print(f"Usage: python3 {sys.argv[0]} <URL>")
         print("URLs should be enclosed in single or double quotation marks.")
     else:
-        video_view(sys.argv[1])
+        viewer = BingeViewer(sys.argv[1])
+        viewer.start_viewing()
