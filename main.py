@@ -38,7 +38,6 @@ def login(driver, wait):
             print("An error has occurred.")
             return 1
 
-
 def video_view(url):
     service = Service(executable_path=GeckoDriverManager().install())
     driver = webdriver.Firefox(service=service)
@@ -50,8 +49,9 @@ def video_view(url):
     if login(driver, wait):
         driver.quit()
 
-    # play_btn = driver.find_element(By.CLASS_NAME, "vjs-big-play-button")
-    # play_btn.click()
+    play_btn = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vjs-big-play-button")))
+    play_btn.click()
+    
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
