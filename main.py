@@ -69,6 +69,9 @@ class BingeViewer:
             sleep(15)
         print(f"Finish viewing \"{video_title.text}\"")
 
+        comp_btn = self.driver.find_element(By.XPATH, "//div[@data-region='completion-info']/button")
+        comp_btn.click()
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
