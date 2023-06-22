@@ -66,17 +66,9 @@ class BingeViewer:
             remaining_t = self.driver.find_element(By.CLASS_NAME, "vjs-remaining-time-display")
             if remaining_t.text == "0:00":
                 break
-            sleep(10)
-
+            sleep(15)
         print(f"Finish viewing \"{video_title.text}\"")
-    
-    @staticmethod
-    def time_calc(time):
-        colon_idx = time.find(":")
-        min = int(time[:colon_idx])
-        sec = int(time[colon_idx + 1:])
-        return min * 60 + sec
-    
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
