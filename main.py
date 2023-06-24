@@ -21,8 +21,17 @@ class BingeViewer:
         if self.login():
             self.driver.quit()
 
-        self.video_view()
-        self.next_video()
+        self.wait.until(EC.presence_of_all_elements_located)
+
+        while True:
+            sleep(10)
+            self.video_view()
+
+            if self.next_video():
+                break
+
+        print("All viewing done.")
+        self.driver.quit()
 
     def login(self):
         self.wait.until(EC.presence_of_all_elements_located)
@@ -55,22 +64,31 @@ class BingeViewer:
                 return 1
 
     def video_view(self):
-        play_btn = self.wait.until(EC.presence_of_element_located((By.CLASS_NAME, "vjs-big-play-button")))
+        self.video_title = self.driver.find_element(By.XPATH, "//section[@id='region-main']/div/h2")
+        print(f"Start viewing \"{self.video_title.text}\"")
+
+        play_btn = self.driver.find_element(By.CLASS_NAME, "vjs-big-play-button")
         play_btn.click()
     
     def next_video(self):
-        video_title = self.driver.find_element(By.XPATH, "//section[@id='region-main']/div/h2")
-        print(f"Start viewing \"{video_title.text}\"")
-
         while True:
             remaining_t = self.driver.find_element(By.CLASS_NAME, "vjs-remaining-time-display")
             if remaining_t.text == "0:00":
                 break
             sleep(15)
-        print(f"Finish viewing \"{video_title.text}\"")
+        print(f"Finish viewing \"{self.video_title.text}\"")
 
-        comp_btn = self.driver.find_element(By.XPATH, "//div[@data-region='completion-info']/button")
-        comp_btn.click()
+        completion_btn = self.driver.find_element(By.XPATH, "//div[@data-region='completion-info']/button")
+        completion_btn.click()
+        sleep(1)
+
+        try:
+            next_url = self.driver.find_element(By.ID, "next-activity-link")
+            next_url.click()
+            return 0
+        except Exception as e:
+            print(e)
+            return 1
 
 
 if __name__ == '__main__':
