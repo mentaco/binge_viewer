@@ -8,14 +8,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
 
-class BingeViewer:
+class Checker:
     def __init__(self, url):
         self.start_url = url
         self.service = Service(executable_path=GeckoDriverManager().install())
         self.driver = webdriver.Firefox(service=self.service)
         self.wait = WebDriverWait(driver=self.driver, timeout=15)
     
-    def start_viewing(self):
+    def start_check(self):
         self.driver.get(self.start_url)
 
         if self.login():
@@ -64,24 +64,9 @@ class BingeViewer:
 
     def video_view(self):
         self.video_title = self.driver.find_element(By.XPATH, "//section[@id='region-main']/div/h2")
-        # print(f"Start viewing \"{self.video_title.text}\"")
         print(f"Check \"{self.video_title.text}\"")
-
-        # play_btn = self.driver.find_element(By.CLASS_NAME, "vjs-big-play-button")
-        # play_btn.click()
     
     def next_video(self):
-        # while True:
-        #     remaining_t = self.driver.find_element(By.CLASS_NAME, "vjs-remaining-time-display")
-        #     if remaining_t.text == "0:00":
-        #         break
-        #     sleep(15)
-        # print(f"Finish viewing \"{self.video_title.text}\"")
-
-        # completion_btn = self.driver.find_element(By.XPATH, "//div[@data-region='completion-info']/button")
-        # completion_btn.click()
-        # sleep(1)
-
         comp_txt = self.driver.find_element(By.CLASS_NAME, "complete-state")
         if comp_txt == "未完了":
             print("未完了：\"{self.video_title.text}\"")
@@ -101,5 +86,5 @@ if __name__ == '__main__':
         print(f"Usage: python3 {sys.argv[0]} <URL>")
         print("URLs should be enclosed in single or double quotation marks.")
     else:
-        viewer = BingeViewer(sys.argv[1])
-        viewer.start_viewing()
+        viewer = Checker(sys.argv[1])
+        viewer.start_check()
